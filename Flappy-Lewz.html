@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lewz Site - Flappy Bird</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at center, #000020, #000);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none; /* Disable text selection */
+        }
+
+        canvas {
+            background-color: #111;
+            display: block;
+        }
+
+        .orientation-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5em;
+            color: #00ffcc;
+            background-color: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            z-index: 9999;
+        }
+
+        @media only screen and (orientation: landscape) {
+            .orientation-message {
+                display: block;
+            }
+        }
+
+        .share-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: #00ffcc;
+            color: #111;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .share-button:hover {
+            background-color: #00cc99;
+        }
+
+        #startGameButton {
+            position: absolute;
+            bottom: 50%;
+            background-color: #00ffcc;
+            color: #111;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #startGameButton:hover {
+            background-color: #00cc99;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div class="orientation-message">Please rotate your device to portrait mode.</div>
+    <button class="share-button" id="shareButton" style="display: none;">Share Score</button>
+    <button id="startGameButton">Start Game</button>
+
+    <audio id="flapSound" src="wing.ogg"></audio>
+    <audio id="hitSound" src="hit.ogg"></audio>
+    <audio id="powerUpSound" src="point.ogg"></audio>
+    <audio id="bgMusic" src="DryOut.mp3" loop></audio>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const flapSound = document.getElementById('flapSound');
+        const hitSound = document.getElementById('hitSound');
+        const powerUpSound = document.getElementById('powerUpSound');
+        const bgMusic = document.getElementById('bgMusic');
+
+        let bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 30,
+            height: 30,
+            gravity: 0.6,
+            lift: -11,
+            velocity: 0,
+            sprite: new Image(),
+            frame: 0,
+            extraHits: 0
+        };
+
+        bird.sprite.src = 'bird.png';
+
+        let pipes = [];
+        let pipeWidth = 65;
+        let pipeGap = 175;
+        let pipeSpeed = 2;
+        let frameCount = 0;
+        let score = 0;
+        let gameOver = false;
+        let powerUps = [];
+        let particles = []; // Particle array
+
+        function drawBird() {
+            const spriteSize = 30;
+            ctx.drawImage(bird.sprite, bird.frame * spriteSize, 0, spriteSize, spriteSize, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                ctx.fillStyle = '#00ffcc';
+                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topHeight);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottomHeight, pipeWidth, pipe.bottomHeight);
+            });
+        }
+
+        function drawPowerUps() {
+            powerUps.forEach(powerUp => {
+                ctx.fillStyle = '#ffcc00';
+                ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+            });
+        }
+
+        function drawParticles() {
+            particles.forEach((particle, index) => {
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Update particle position
+                particle.y -= particle.velocityY;
+                particle.x += particle.velocityX;
+                particle.size *= 0.95; // Shrink the particle over time
+
+                // Remove particle if too small
+                if (particle.size < 0.5) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        function createExplosion(x, y) {
+            const numParticles = 10;
+            for (let i = 0; i < numParticles; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const velocityX = Math.cos(angle) * 2;
+                const velocityY = Math.sin(angle) * 2;
+                particles.push({
+                    x: x,
+                    y: y,
+                    size: 5,
+                    velocityX: velocityX,
+                    velocityY: velocityY,
+                    color: '#ffcc00' // Explosion color
+                });
+            }
+        }
+
+        function updatePipes() {
+            if (frameCount % 100 === 0) {
+                let topHeight = Math.random() * (canvas.height - pipeGap);
+                let bottomHeight = canvas.height - topHeight - pipeGap;
+
+                pipes.push({
+                    x: canvas.width,
+                    topHeight: topHeight,
+                    bottomHeight: bottomHeight,
+                });
+            }
+
+            pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
+
+            pipes.forEach(pipe => {
+                pipe.x -= pipeSpeed;
+
+                if (pipe.x === bird.x) {
+                    score++;
+                }
+
+                if (pipe.x < bird.x + bird.width &&
+                    pipe.x + pipeWidth > bird.x &&
+                    (bird.y < pipe.topHeight || bird.y + bird.height > canvas.height - pipe.bottomHeight)) {
+                    if (bird.extraHits > 0) {
+                        bird.extraHits--;
+                        pipes = pipes.filter(p => p !== pipe);
+                    } else {
+                        hitSound.play();
+                        gameOver = true;
+                    }
+                }
+            });
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                if (bird.extraHits > 0) {
+                    bird.extraHits--;
+                    bird.y = 0;
+                } else {
+                    hitSound.play();
+                    gameOver = true;
+                }
+            }
+        }
+
+        function updatePowerUps() {
+            if (frameCount % 500 === 0 && pipes.length > 0) {
+                let lastPipe = pipes[pipes.length - 1];
+                let powerUpX = canvas.width;
+                let powerUpY = lastPipe.topHeight + (pipeGap / 2) - 10;
+                let width = 20;
+                let height = 20;
+
+                powerUps.push({ x: powerUpX, y: powerUpY, width, height });
+            }
+
+            powerUps = powerUps.filter(powerUp => powerUp.x + powerUp.width > 0);
+
+            powerUps.forEach(powerUp => {
+                powerUp.x -= pipeSpeed;
+
+                if (powerUp.x < bird.x + bird.width &&
+                    powerUp.x + powerUp.width > bird.x &&
+                    bird.y < powerUp.y + powerUp.height &&
+                    bird.y + bird.height > powerUp.y) {
+                    powerUpSound.play();
+                    createExplosion(powerUp.x + powerUp.width / 2, powerUp.y + powerUp.height / 2); // Create explosion at power-up location
+                    powerUps = powerUps.filter(p => p !== powerUp);
+                    bird.extraHits += 1;
+                }
+            });
+        }
+
+        function resetGame() {
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            bird.extraHits = 0;
+            pipes = [];
+            powerUps = [];
+            particles = []; // Reset particles
+            score = 0;
+            gameOver = false;
+        }
+
+        function saveHighScore(newScore) {
+            let highScore = localStorage.getItem('highScore') || 0;
+            let username = localStorage.getItem('username') || "Player";
+
+            if (newScore > highScore) {
+                highScore = newScore;
+                let newUsername = prompt("New High Score! Enter your username:");
+                if (newUsername) {
+                    username = newUsername;
+                    localStorage.setItem('highScore', highScore);
+                    localStorage.setItem('username', username);
+                }
+            }
+        }
+
+        function shareScore() {
+            const url = `https://twitter.com/intent/tweet?text=I%20scored%20${score}%20in%20Flappy%20Bird%20on%20Lewz%20Site!%20Check%20it%20out:%20https://lewzsite.xyz`;
+            window.open(url, '_blank');
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!gameOver) {
+                updateBird();
+                updatePipes();
+                updatePowerUps();
+
+                drawBird();
+                drawPipes();
+                drawPowerUps();
+                drawParticles(); // Draw particles
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Arial';
+                ctx.fillText(`Score: ${score}`, 10, 30);
+                ctx.fillText(`High Score: ${localStorage.getItem('highScore') || 0} (${localStorage.getItem('username') || "Player"})`, 10, 60);
+                ctx.fillText(`Extra Hits: ${bird.extraHits}`, 10, 90);
+
+                frameCount++;
+            } else {
+                ctx.fillStyle = '#fff';
+                ctx.font = '40px Arial';
+                ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+                ctx.font = '20px Arial';
+                ctx.fillText('Tap to Restart', canvas.width / 2 - 70, canvas.height / 2 + 40);
+                saveHighScore(score);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('shareButton').addEventListener('click', shareScore);
+        document.getElementById('startGameButton').addEventListener('click', () => {
+            bgMusic.play(); // Start background music
+            document.getElementById('startGameButton').style.display = 'none'; // Hide start button
+            gameLoop(); // Start the game loop
+        });
+
+        canvas.addEventListener('touchstart', () => {
+            if (gameOver) {
+                resetGame();
+            } else {
+                bird.velocity = bird.lift;
+                flapSound.play();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        function checkMobile() {
+            if (!/Mobi|Android/i.test(navigator.userAgent)) {
+                document.body.innerHTML = "<h1>This game is only available on mobile devices.</h1>";
+            }
+        }
+
+        checkMobile();
+    </script>
+</body>
+</html> 

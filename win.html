@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lewz or Win</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Lewz or Win</h1>
+    </header>
+
+    <main>
+        <div id="menuContainer">
+            <button id="playButton">Play</button>
+            <button id="highScoresButton">High Scores</button>
+        </div>
+
+        <div id="gameContainer" style="display: none;">
+            <canvas id="snakeGame"></canvas>
+            <div id="score">Score: 0</div>
+        </div>
+
+        <div id="highScoresContainer" style="display: none;">
+            <h2>High Scores</h2>
+            <ul id="highScoresList"></ul>
+            <button id="backToMenu">Back to Menu</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Lewz or Win - A Galactic Gaming Experience</p>
+    </footer>
+
+    <script src="snake.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lewz Site</title>
+    <style>
+        /* CSS remains the same */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(circle at center, #000020, #000);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: -80px;
+            margin-top: -10px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #00ffcc;
+            text-shadow: 2px 2px 10px #00ffcc;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            color: #00ffcc;
+            text-shadow: 0.2px 0.2px 10px #00ffcc;
+            animation: glow 3s ease-in-out infinite;
+            margin-left: 95px;
+            margin-top: 65px;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px #00ffcc, 0 0 40px #00ffcc; }
+            50% { text-shadow: 0 0 20px #00ffcc, 0 0 60px #00cc99; }
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1.2rem;
+            background-color: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #00cc99;
+        }
+
+        #gameFrame {
+            width: 95%;
+            height: 500px;
+            border: 5px solid #00ffcc;
+            margin-top: 20px;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lewz Site</h1>
+    </header>
+    <!-- Game Collection -->
+    <section id="gameCollection">
+        <h2>Select a Game</h2>
+        <button onclick="loadGame('#')">Play Tetris</button>
+        <button onclick="loadGame('https://example.com/path-to-pong-game')">Play Pong</button>
+        <button onclick="loadGame('https://example.com/path-to-snake-game')">Play Snake</button>
+    </section>
+
+    <!-- Game Frame -->
+    <iframe id="gameFrame" src="" frameborder="0"></iframe>
+
+    <footer>
+        <p>Lewz Site | © 2024 | Made By SkFromDaBlock </p>
+    </footer>
+
+    <script>
+        function loadGame(gameURL) {
+            document.getElementById('gameFrame').src = gameURL;
+        }
+    </script>
+    <script src="snake.js"></script
+</body>
+</html>

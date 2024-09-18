@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lewz Site</title>
+    <style>
+        /* Basic Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at center, #000020, #000);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling during fullscreen */
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* a styles */
+        a {
+            text-decoration: none;
+            color: grey;
+        }
+
+        /* H1 Animation */
+        h1 a {
+            text-decoration: none;
+            color: #00ffcc;
+            font-size: 3rem;
+            text-shadow: 2px 2px 10px #00ffcc;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 30px #00ffcc, 0 0 40px #00ffcc;
+            }
+            50% {
+                text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc, 0 0 40px #00ffcc, 0 0 50px #00cc99;
+            }
+        }
+
+        /* Full-Screen Button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        /* Section Transitions */
+        section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateY(20px);
+        }
+
+        section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typing Effect with CSS */
+        .typing-effect::after {
+            content: attr(data-text);
+            border-right: 2px solid #00ffcc;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            animation: typing 2.5s steps(30, end), blink 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        @keyframes blink {
+            from, to {
+                border-color: transparent;
+            }
+            50% {
+                border-color: #00ffcc;
+            }
+        }
+
+        /* Mobile Styling */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            footer { font-size: 0.8rem; }
+            .fullscreen-btn { font-size: 0.8rem; padding: 8px 12px; }
+        }
+
+        /* Orientation and Device Check Styles */
+        .orientation-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5em;
+            color: #00ffcc; /* Teal text */
+            background-color: #111; /* Dark background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5); /* Teal glowing effect */
+            z-index: 9999;
+        }
+
+        @media only screen and (orientation: landscape) {
+            .orientation-message {
+                display: block;
+            }
+        }
+
+        /* Fixed Bottom Navigation */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #111;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        nav button {
+            background-color: transparent;
+            border: none;
+            color: #00ffcc;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        nav button.active {
+            border-bottom: 2px solid #00ffcc; /* Highlight active button */
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            position: fixed;
+            bottom: 50px;
+        }
+        
+        .hidden-link {
+            position: flex;
+            left: -999px;
+            top: auto;
+            width: 0px;
+            height: 0px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .but {
+            position: absolute;
+            top: 75px;
+            left: 75px;
+            background-color: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 1000; /* Ensure it's on top */ 
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="lewzsite.html">Lewz Site</a></h1>
+    </header>
+    <br><br><br>
+
+    <!-- Full-Screen Button -->
+    <button class="fullscreen-btn" aria-label="Toggle Fullscreen" onclick="toggleFullscreen()">Go Fullscreen</button>
+
+    <!-- Orientation Message -->
+    <div class="orientation-message">
+        Please rotate your device to portrait mode.
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <button aria-label="Home" onclick="showSection('home')">Home</button>
+        <button aria-label="About" onclick="showSection('about')">About</button>
+        <button aria-label="Contact" onclick="showSection('contact')">Contact</button>
+    </nav>
+
+    <!-- Sections -->
+    <section id="home" class="active">
+        <p class="typing-effect" data-text="Welcome to Lewz Site!"></p>
+    </section>
+
+    <section id="about">
+        <p class="typing-effect" data-text="Ma site bitch"></p>
+    </section>
+
+    <section id="contact">
+        <p class="typing-effect" data-text="skfromdablock@lewzsite.xyz"><button id="btd" class="but">Contact</button></p>
+    </section>
+    <br><br><br>
+    
+    <footer>
+        <p>
+          <a href="http://lewzsite.xyz" class="hidden-link">LewzSite.xyz</a> | © 2024 | GitHub:
+          <a href="index.html" class="hidden-link">SkFromDaBlock</a>
+        </p>
+    </footer>
+
+    <script>
+        // Toggle Fullscreen Mode
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error("Failed to enter fullscreen mode:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Show the selected section and apply the typing effect
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+            const section = document.getElementById(sectionId);
+            const button = Array.from(document.querySelectorAll('nav button')).find(btn => btn.getAttribute('aria-label').toLowerCase() === sectionId);
+            section.classList.add('active');
+            if (button) button.classList.add('active');
+        }
+
+        // Check for mobile device and orientation
+        function checkDeviceAndOrientation() {
+            const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+            const orientationMessage = document.querySelector('.orientation-message');
+            
+            if (!isMobile) {
+                document.body.innerHTML = "<h1>This site is only available on mobile devices.</h1>";
+            } else {
+                window.addEventListener('orientationchange', () => {
+                    if (window.orientation === 90 || window.orientation === -90) {
+                        orientationMessage.style.display = 'block';
+                    } else {
+                        orientationMessage.style.display = 'none';
+                    }
+                });
+
+                // Initial check
+                if (window.orientation === 90 || window.orientation === -90) {
+                    orientationMessage.style.display = 'block';
+                } else {
+                    orientationMessage.style.display = 'none';
+                }
+            }
+        }
+
+        checkDeviceAndOrientation();
+    </script>
+</body>
+</html>

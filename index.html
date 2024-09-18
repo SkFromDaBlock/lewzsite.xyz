@@ -39,7 +39,7 @@
             color: #00ffcc;
             font-size: 3rem;
             text-shadow: 2px 2px 10px #00ffcc;
-            animation: glow 3s ease-in-out infinite;
+            animation: glow 0.25s ease-in-out infinite;
         }
 
         @keyframes glow {
@@ -170,7 +170,7 @@
             position: fixed;
             bottom: 50px;
         }
-        
+
         .hidden-link {
             position: flex;
             left: -999px;
@@ -195,12 +195,171 @@
             font-size: 0.9rem;
             z-index: 1000; /* Ensure it's on top */ 
         }
+
+        /* Terminal Styling */
+        #terminal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: black;
+            color: green;
+            font-family: 'Courier New', Courier, monospace;
+            z-index: 10000;
+            padding: 10px;
+            display: none;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #terminal-input {
+            width: 100%;
+            background: black;
+            color: green;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        #open-terminal {
+            position: absolute;
+            top: 75px;
+            left: 75px;
+            background-color: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 1000; /* Ensure it's on top */
+        }
+
+        /* Canvas for stars */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
         
+        /* Glitch effect */
+/* Classic glitch effect */
+.glitch-classic {
+    position: relative;
+    font-size: 3rem;
+    color: #00ffcc;
+    animation: glitch-classic 2s infinite;
+}
+
+.glitch-classic::before,
+.glitch-classic::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    color: #ff00ff;
+    z-index: -1;
+    animation: glitch-classic-anim 2s infinite;
+}
+
+.glitch-classic::before {
+    color: red;
+    clip: rect(0, 900px, 0, 0);
+    animation: glitch-classic-before 1.5s infinite;
+}
+
+.glitch-classic::after {
+    color: blue;
+    clip: rect(0, 900px, 0, 0);
+    animation: glitch-classic-after 1.5s infinite;
+}
+
+@keyframes glitch-classic {
+    0%, 20%, 40%, 60%, 80%, 100% {
+        transform: translate(0);
+    }
+    10% {
+        transform: translate(-2px, 2px);
+    }
+    30% {
+        transform: translate(2px, -2px);
+    }
+    50% {
+        transform: translate(-1px, 1px);
+    }
+    70% {
+        transform: translate(3px, -3px);
+    }
+    90% {
+        transform: translate(-3px, 3px);
+    }
+}
+
+@keyframes glitch-classic-before {
+    0%, 20%, 40%, 60%, 80%, 100% {
+        clip: rect(0, 9999px, 0, 0);
+    }
+    10% {
+        clip: rect(5px, 9999px, 15px, 0);
+        transform: translate(5px, -5px);
+    }
+    30% {
+        clip: rect(20px, 9999px, 30px, 0);
+        transform: translate(-5px, 5px);
+    }
+    50% {
+        clip: rect(40px, 9999px, 50px, 0);
+        transform: translate(3px, -3px);
+    }
+    70% {
+        clip: rect(60px, 9999px, 70px, 0);
+        transform: translate(-3px, 3px);
+    }
+    90% {
+        clip: rect(80px, 9999px, 90px, 0);
+        transform: translate(2px, -2px);
+    }
+}
+
+@keyframes glitch-classic-after {
+    0%, 20%, 40%, 60%, 80%, 100% {
+        clip: rect(0, 9999px, 0, 0);
+    }
+    10% {
+        clip: rect(60px, 9999px, 80px, 0);
+        transform: translate(-5px, 5px);
+    }
+    30% {
+        clip: rect(30px, 9999px, 40px, 0);
+        transform: translate(5px, -5px);
+    }
+    50% {
+        clip: rect(10px, 9999px, 20px, 0);
+        transform: translate(-3px, 3px);
+    }
+    70% {
+        clip: rect(50px, 9999px, 60px, 0);
+        transform: translate(2px, -2px);
+    }
+    90% {
+        clip: rect(70px, 9999px, 90px, 0);
+        transform: translate(-2px, 2px);
+    }
+}
+}
+}
     </style>
 </head>
 <body>
+    <canvas id="background-canvas"></canvas>
+
     <header>
-        <h1><a href="lewzsite.html">Lewz Site</a></h1>
+        <h1 class="glitch-classic"><a href="#">Lewz Site</a></h1>
     </header>
     <br><br><br>
 
@@ -225,18 +384,24 @@
     </section>
 
     <section id="about">
-        <p class="typing-effect" data-text="Ma site bitch"></p>
+        <p class="typing-effect" data-text="its just sommat to do init...."></p>
     </section>
 
     <section id="contact">
-        <p class="typing-effect" data-text="skfromdablock@lewzsite.xyz"><button id="btd" class="but">Contact</button></p>
+        <p class="typing-effect" data-text="skfromdablock@lewzsite.xyz"><button id="open-terminal" class="open-terminal">Contact</button></p>
     </section>
     <br><br><br>
-    
+
+    <!-- Hidden Terminal -->
+    <div id="terminal">
+        <p><span id="terminal-output"></span></p>
+        <input type="text" id="terminal-input" placeholder="Enter command..."/>
+    </div>
+
     <footer>
         <p>
           <a href="http://lewzsite.xyz" class="hidden-link">LewzSite.xyz</a> | © 2024 | GitHub:
-          <a href="index.html" class="hidden-link">SkFromDaBlock</a>
+          <a href="https://github.com/SkFromDaBlock" class="hidden-link">SkFromDaBlock</a>
         </p>
     </footer>
 
@@ -266,7 +431,7 @@
         function checkDeviceAndOrientation() {
             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
             const orientationMessage = document.querySelector('.orientation-message');
-            
+
             if (!isMobile) {
                 document.body.innerHTML = "<h1>This site is only available on mobile devices.</h1>";
             } else {
@@ -287,7 +452,79 @@
             }
         }
 
+        // Terminal Easter Egg Functionality
+        const terminal = document.getElementById("terminal");
+        const terminalInput = document.getElementById("terminal-input");
+        const terminalOutput = document.getElementById("terminal-output");
+        const openTerminalBtn = document.getElementById("open-terminal");
+
+        openTerminalBtn.addEventListener('click', () => {
+            terminal.style.display = terminal.style.display === "none" ? "block" : "none";
+            terminalInput.focus();
+        });
+
+        terminalInput.addEventListener("keydown", function(e) {
+          if (e.key === "Enter") {
+            const command = terminalInput.value.toLowerCase();
+            terminalInput.value = "";
+        
+            if (command === "help") {
+              terminalOutput.innerHTML += "<br>Available commands: help, hey, exit";
+            } else if (command === "hey") {
+              terminalOutput.innerHTML += "<br>Hey, Im going to Email you back with a response on a fix to your issue.";
+              setTimeout(function() {
+                window.location.href = "mailto:SkFromDaBlock@lewzsite.xyz";
+              }, 4000); 
+              
+            } else if (command === "exit") {
+              terminal.style.display = "none";
+            } else {
+              terminalOutput.innerHTML += "<br>Unknown command: " + command;
+            }
+          }
+        });
+
+        // Starry Background Animation
+        const canvas = document.getElementById('background-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let stars = [];
+
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                vx: Math.random() * 0.5 - 0.25,
+                vy: Math.random() * 0.5 - 0.25
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0 || star.x > canvas.width) star.vx *= -1;
+                if (star.y < 0 || star.y > canvas.height) star.vy *= -1;
+            });
+
+            requestAnimationFrame(drawStars);
+        }
+
+        drawStars();
+
         checkDeviceAndOrientation();
+
     </script>
 </body>
 </html>

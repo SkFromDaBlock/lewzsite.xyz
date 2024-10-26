@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerable Page</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #00ffcc;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vulnerable Login</h1>
+    <form action="/vulnerable_login" method="POST">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="admin"><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" value="password123"><br><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <h2>Search for Users</h2>
+    <form action="/vulnerable_search" method="GET">
+        <label for="search">Enter Username:</label>
+        <input type="text" id="search" name="search">
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Post a Comment</h2>
+    <form action="/post_comment" method="POST">
+        <label for="comment">Comment:</label><br>
+        <textarea id="comment" name="comment"></textarea><br>
+        <button type="submit">Post Comment</button>
+    </form>
+
+    <!-- Admin panel link that should be hidden -->
+    <a href="/admin_panel">Access Admin Panel</a>
+
+    <footer style="margin-top: 50px; color: grey;">
+        <p>For testing purposes only.</p>
+    </footer>
+</body>
+</html>
